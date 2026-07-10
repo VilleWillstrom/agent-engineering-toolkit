@@ -1,0 +1,53 @@
+schema_version: 1
+
+usage_telemetry:
+  consent_status: pending
+  # Allowed values: pending, granted, denied
+  consent_recorded_at: null
+  consent_recorded_by: null
+  storage_scope: local_repository_only
+  # Codex must ask immediately after initialization and persist the answer here.
+  ask_after_initialization: true
+
+collection:
+  enabled: false
+  formats:
+    jsonl: .agent-team/metrics/model-usage.jsonl
+    csv: .agent-team/metrics/model-usage.csv
+  redact_prompts: true
+  redact_command_output: true
+  store_short_error_excerpt: true
+  error_excerpt_max_characters: 500
+  fields:
+    - task_id
+    - run_id
+    - provider
+    - model
+    - worker
+    - started_at
+    - ended_at
+    - duration_seconds
+    - exit_code
+    - outcome
+    - interruption_classification
+    - input_tokens
+    - output_tokens
+    - cached_input_tokens
+    - provider_usage_percent
+    - provider_remaining_percent
+    - usage_values_source
+    - usage_values_estimated
+    - files_changed
+    - lines_added
+    - lines_deleted
+    - validation_status
+    - retry_number
+    - fallback_worker
+    - quality_outcome
+    - notes
+
+rules:
+  - Never invent unavailable usage values; record null instead.
+  - Mark every estimated value explicitly.
+  - Do not transmit telemetry outside the repository without separate human permission.
+  - Do not store secrets, full prompts, or sensitive command output.
