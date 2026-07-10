@@ -1,0 +1,22 @@
+commands:
+  build:
+    command: "UNKNOWN"
+    required: true
+  unit_tests:
+    command: "UNKNOWN"
+    required: true
+  lint:
+    command: "UNKNOWN"
+    required: true
+  integration_tests:
+    command: "UNKNOWN"
+    required: false
+  emulator_or_e2e_tests:
+    command: "UNKNOWN"
+    required: false
+
+rules:
+  - Replace UNKNOWN only with commands verified from repository evidence.
+  - Do not mark a command successful unless its process exits successfully.
+  - Record unavailable tools or environment limitations explicitly.
+  - Do not weaken validation commands merely to make a task pass.
