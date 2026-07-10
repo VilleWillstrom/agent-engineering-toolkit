@@ -21,6 +21,9 @@ $files = @(
     @{ Source = '.agent-team/routing.yaml'; Destination = '.agent-team/routing.yaml' },
     @{ Source = '.agent-team/permissions.yaml'; Destination = '.agent-team/permissions.yaml' },
     @{ Source = '.agent-team/commands.yaml'; Destination = '.agent-team/commands.yaml' },
+    @{ Source = '.agent-team/observability.yaml'; Destination = '.agent-team/observability.yaml' },
+    @{ Source = '.agent-team/metrics/model-usage.csv'; Destination = '.agent-team/metrics/model-usage.csv' },
+    @{ Source = '.agent-team/metrics/README.md'; Destination = '.agent-team/metrics/README.md' },
     @{ Source = 'task-contract.yaml'; Destination = '.agent-team/tasks/TASK-TEMPLATE.yaml' }
 )
 
@@ -45,3 +48,4 @@ New-Item -ItemType Directory -Path (Join-Path $targetRoot '.agent-team/reviews')
 New-Item -ItemType File -Path (Join-Path $targetRoot '.agent-team/reviews/.gitkeep') -Force | Out-Null
 
 Write-Host "Toolkit $version installed. Replace all template placeholders using verified repository evidence before committing."
+Write-Host "Codex must now ask the human whether local model-usage telemetry may be recorded and persist the answer in .agent-team/observability.yaml."
