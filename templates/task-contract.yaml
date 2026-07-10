@@ -1,0 +1,47 @@
+task:
+  id: "TASK-000"
+  title: "Replace with a concise task title"
+  status: planned
+  goal: "One measurable outcome"
+  rationale: "Why this task is needed"
+
+scope:
+  allowed_paths:
+    - "path/to/file"
+  forbidden_paths:
+    - "protected/or/unrelated/path"
+  out_of_scope:
+    - "Explicitly excluded work"
+
+context:
+  authoritative_documents:
+    - "path/to/doc"
+  relevant_interfaces:
+    - "Symbol or API name"
+  assumptions: []
+  unknowns: []
+
+delivery:
+  selected_worker: "codex-self"
+  branch: "agent/TASK-000-short-name"
+  max_attempts: 3
+  allow_new_dependencies: false
+
+acceptance_criteria:
+  - "Observable criterion"
+
+validation:
+  commands:
+    - "verified command"
+  required_evidence:
+    - "command and exit result"
+    - "changed-file summary"
+    - "residual risks and unknowns"
+
+review:
+  require_codex_review: true
+  require_human_merge_approval: true
+  reject_if:
+    - "scope was exceeded"
+    - "required validation failed or was not run"
+    - "architecture or public API changed without authorization"
