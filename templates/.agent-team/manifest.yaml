@@ -1,0 +1,32 @@
+toolkit:
+  name: agent-engineering-toolkit
+  version: "{{TOOLKIT_VERSION}}"
+  source: "{{TOOLKIT_SOURCE}}"
+
+project:
+  name: "{{PROJECT_NAME}}"
+  repository: "{{PROJECT_REPOSITORY}}"
+  protected_branch: "{{PROTECTED_BRANCH}}"
+  technology_stack:
+    - "UNKNOWN"
+  architecture: "UNKNOWN"
+  active_scope: "UNKNOWN"
+  authoritative_docs:
+    - "UNKNOWN"
+
+workflow:
+  engineering_director: codex
+  available_workers:
+    - codex-self
+    - claude-code
+  require_task_branch: true
+  require_clean_git: true
+  require_final_codex_review: true
+  require_human_merge_approval: true
+  max_attempts_per_task: 3
+
+status:
+  initialized_at: "UNKNOWN"
+  initialized_by: "UNKNOWN"
+  unresolved_unknowns:
+    - "Populate this manifest from verified repository evidence."
