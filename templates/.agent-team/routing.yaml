@@ -1,0 +1,33 @@
+default_worker: codex-self
+
+workers:
+  codex-self:
+    use_when:
+      - low-risk configuration or documentation change
+      - narrow bug fix with verified context
+      - focused test addition
+      - task where delegation overhead exceeds implementation cost
+    constraints:
+      require_task_contract: true
+      require_final_review: true
+
+  claude-code:
+    use_when:
+      - implementation benefits from a dedicated worker
+      - UI or component work has explicit boundaries
+      - multi-step implementation remains narrow enough for scoped execution
+      - Codex determines independent implementation and review improves quality
+    constraints:
+      require_task_contract: true
+      require_explicit_allowed_paths: true
+      require_explicit_forbidden_paths: true
+      require_validation_commands: true
+      max_attempts: 3
+
+routing_rules:
+  - never delegate merely to create activity
+  - choose the least expensive capable worker
+  - prefer codex-self for trivial changes
+  - prefer claude-code only when the task contract is complete
+  - escalate architectural ambiguity to the human
+  - do not use a worker whose required context cannot be bounded safely
