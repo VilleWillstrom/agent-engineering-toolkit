@@ -7,6 +7,7 @@ workers:
       - narrow bug fix with verified context
       - focused test addition
       - task where delegation overhead exceeds implementation cost
+      - Claude Code is unavailable, interrupted, usage-limited, or produced no usable result
     constraints:
       require_task_contract: true
       require_final_review: true
@@ -24,10 +25,40 @@ workers:
       require_validation_commands: true
       max_attempts: 3
 
+fallback:
+  on_worker_interruption: codex-self
+  continue_task_without_human_prompt: true
+  preserve_partial_diff: true
+  review_partial_worker_changes_before_continuing: true
+  create_interruption_checkpoint: true
+  interruption_checkpoint_directory: .agent-team/reviews
+  interruption_classifications:
+    - usage_limit
+    - authentication
+    - tool_refusal
+    - timeout
+    - nonzero_exit
+    - invalid_or_empty_result
+    - validation_failure
+    - unknown
+  final_report_required: true
+  final_report_fields:
+    - worker_and_model_used
+    - interruption_classification
+    - phase_where_worker_stopped
+    - work_completed_before_interruption
+    - work_completed_by_codex_after_fallback
+    - work_that_lost_independent_worker_input
+    - compensating_review_and_testing
+    - residual_quality_risk
+
 routing_rules:
   - never delegate merely to create activity
   - choose the least expensive capable worker
   - prefer codex-self for trivial changes
   - prefer claude-code only when the task contract is complete
+  - use expensive frontier models only when their expected quality advantage justifies observed usage
+  - treat historical usage multipliers as project observations, not universal facts
+  - when Claude becomes unavailable, Codex continues the task to completion rather than stopping
   - escalate architectural ambiguity to the human
   - do not use a worker whose required context cannot be bounded safely
