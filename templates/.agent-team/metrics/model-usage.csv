@@ -1,0 +1,1 @@
+task_id,run_id,provider,model,worker,started_at,ended_at,duration_seconds,exit_code,outcome,interruption_classification,input_tokens,output_tokens,cached_input_tokens,provider_usage_percent,provider_remaining_percent,usage_values_source,usage_values_estimated,files_changed,lines_added,lines_deleted,validation_status,retry_number,fallback_worker,quality_outcome,notes
