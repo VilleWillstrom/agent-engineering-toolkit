@@ -7,7 +7,15 @@ workers:
       - narrow bug fix with verified context
       - focused test addition
       - task where delegation overhead exceeds implementation cost
+      - any browser, application, emulator, simulator, device, ADB, CLI, API, database, or runtime interaction
+      - collection of screenshots, screen recordings, layout snapshots, hierarchy dumps, logs, or runtime evidence
       - Claude Code is unavailable, interrupted, usage-limited, or produced no usable result
+    responsibilities:
+      - interactive product operation and testing
+      - bug reproduction in real execution environments
+      - runtime evidence collection
+      - regression validation
+      - final acceptance-criteria verification
     constraints:
       require_task_contract: true
       require_final_review: true
@@ -15,9 +23,23 @@ workers:
   claude-code:
     use_when:
       - implementation benefits from a dedicated worker
+      - UI, UX, interaction design, visual hierarchy, component composition, accessibility presentation, or design-system fidelity is central
       - UI or component work has explicit boundaries
       - multi-step implementation remains narrow enough for scoped execution
       - Codex determines independent implementation and review improves quality
+    may_receive:
+      - screenshots
+      - screen recordings
+      - layout snapshots
+      - hierarchy dumps
+      - design specifications
+      - design tokens
+      - observed runtime evidence
+    must_not:
+      - launch or install the product
+      - navigate or click through the product
+      - operate browsers, applications, emulators, simulators, or devices
+      - perform ADB-driven or other interactive runtime testing
     constraints:
       require_task_contract: true
       require_explicit_allowed_paths: true
@@ -55,8 +77,10 @@ fallback:
 routing_rules:
   - never delegate merely to create activity
   - choose the least expensive capable worker
-  - prefer codex-self for trivial changes
-  - prefer claude-code only when the task contract is complete
+  - prefer codex-self for trivial changes and all interactive testing
+  - prefer claude-code for bounded UI/UX/design-specialist work when the task contract is complete
+  - Codex gathers runtime evidence and may send it to Claude for design comparison
+  - Claude never operates or interactively tests the product
   - use expensive frontier models only when their expected quality advantage justifies observed usage
   - treat historical usage multipliers as project observations, not universal facts
   - when Claude becomes unavailable, Codex continues the task to completion rather than stopping
