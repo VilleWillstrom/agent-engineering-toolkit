@@ -1,0 +1,45 @@
+schema_version: 1
+
+overrides:
+  enabled: true
+  default_scope: current_session
+  require_explicit_human_confirmation: true
+  require_pre_execution_confirmation: true
+  allow_blanket_override: false
+  persist_session_overrides: true
+  session_log: .agent-team/overrides/session-overrides.jsonl
+  prompt_template_fi: >-
+    Ennen kuin aloitamme suorituksen, tehtävä vaatii annetun rajoituksen
+    "{restriction}" overridea, jotta "{reason}" olisi mahdollista.
+    Valtuutatko tämän tämän istunnon ajaksi?
+
+  required_fields:
+    - override_id
+    - task_id
+    - restriction
+    - reason
+    - requested_scope
+    - granted_scope
+    - environment
+    - granted_by
+    - granted_at
+    - expires_at
+    - status
+
+  expiration:
+    default: session_end
+    revoke_on_session_end: true
+    reuse_in_future_sessions: false
+
+  persistent_policy_change:
+    requires_separate_request: true
+    requires_diff_review: true
+    requires_explicit_approval: true
+
+external_constraints:
+  never_claim_override_possible_when:
+    - blocked_by_system_or_platform
+    - prohibited_by_applicable_law_or_service_terms
+    - credentials_or_permissions_are_unavailable
+    - quota_subscription_or_capability_is_unavailable
+    - action_is_outside_available_tooling
