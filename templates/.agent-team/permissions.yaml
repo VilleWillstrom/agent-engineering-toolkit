@@ -1,3 +1,5 @@
+schema_version: 1
+
 git:
   protected_branches:
     - "{{PROTECTED_BRANCH}}"
@@ -28,6 +30,17 @@ operations:
   allow_publish: false
   allow_secret_access: false
 
+conditional_policy:
+  restrictions_are_defaults: true
+  may_be_overridden_by_human: true
+  override_configuration: .agent-team/overrides.yaml
+  override_log: .agent-team/overrides/session-overrides.jsonl
+  require_confirmation_before_execution: true
+  default_override_expiration: session_end
+  persistent_change_requires_separate_approval: true
+
 notes:
   - Project initialization must replace broad allowed paths with verified project-specific boundaries where practical.
-  - A task contract may narrow permissions but must not weaken these repository-level safeguards without explicit human approval.
+  - A task contract may narrow permissions freely.
+  - Weakening a repository-level restriction requires an explicit scoped human override before execution.
+  - An override cannot create unavailable credentials, permissions, quota, subscription, tooling, or platform capability.
