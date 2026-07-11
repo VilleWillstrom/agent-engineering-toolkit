@@ -2,15 +2,15 @@
 
 A versioned, vendor-neutral foundation for running a disciplined AI engineering team inside a software repository.
 
-The default workflow assumes that **OpenAI Codex** and **Claude Code** are already installed and authenticated. Codex acts as the engineering director, planner, router, continuity owner, and reviewer. Claude Code is an optional scoped implementation worker when delegation is justified. Codex may also implement tasks itself and must finish delegated work when Claude becomes unavailable.
+The default workflow assumes that **OpenAI Codex** and **Claude Code** are already installed and authenticated. Codex acts as the engineering director, planner, router, continuity owner, runtime tester, and reviewer. Claude Code is an optional scoped implementation and design specialist. Codex may also implement tasks itself and must finish delegated work when Claude becomes unavailable.
 
-> Status: **v0.2.0 foundation**. Human approval remains mandatory before merging or pushing agent-produced changes.
+> Status: **v0.3.0 foundation**. Human approval remains mandatory before merging or pushing agent-produced changes.
 
 ## What this repository provides
 
 - A reusable `AGENTS.md` policy for the orchestrator and workers.
 - A machine-readable project manifest and task-contract format.
-- Model-routing, Git, testing, security, review, fallback, and usage-observability policies.
+- Model-routing, testing/design ownership, Git, security, review, fallback, and usage-observability policies.
 - Prompt templates for planning, implementation, and review.
 - Bootstrap scripts for installing the toolkit into another repository.
 - Opt-in local CSV/JSONL-compatible model usage reporting.
@@ -50,9 +50,14 @@ Your task:
 6. Validate every populated command and path against the repository. Mark unknown values explicitly; do not guess.
 7. Immediately after initialization, ask the human once whether local model-usage telemetry may be recorded. Persist the answer in `.agent-team/observability.yaml` as `granted` or `denied`, and enable collection only when permission is granted. Do not rely on conversation memory for this permission.
 8. Configure the workflow so that:
-   - Codex is the engineering director, planner, task router, continuity owner, and final reviewer.
+   - Codex is the engineering director, planner, task router, continuity owner, runtime-testing owner, and final reviewer.
    - Codex may execute tasks itself.
+   - Codex performs all browser, installed-application, emulator, simulator, device, ADB, CLI, API, database, filesystem, and other interactive runtime testing.
+   - Codex collects screenshots, screen recordings, layout snapshots, hierarchy dumps, logs, and acceptance-flow evidence.
    - Claude Code is invoked only through a scoped task contract with explicit allowed files, forbidden files, acceptance criteria, validation commands, and an attempt limit.
+   - Prefer Claude Code for bounded UI, UX, interaction-design, visual-hierarchy, component-composition, accessibility-presentation, and design-system-fidelity work.
+   - Codex may provide Claude with screenshots, layout snapshots, recordings, design references, tokens, and observed runtime evidence for comparison against the approved design direction.
+   - Claude must never launch, install, navigate, click through, operate, or interactively test the product, browser, application, emulator, simulator, device, or ADB session.
    - Claude Code is optional and never a single point of failure.
    - If Claude refuses, reaches a usage/capacity limit, exits, times out, or produces no usable result, preserve the branch, partial diff, logs, and validation evidence; classify and record the interruption; review all partial Claude changes; and continue the same task as `codex-self` without stopping merely because Claude is unavailable.
    - Claude interruption must not silently reduce the acceptance criteria or validation requirements.
@@ -63,16 +68,19 @@ Your task:
 9. When usage telemetry is permitted, record only provider/CLI values that are actually available: model, provider, duration, exit code, input/output/cached tokens, reported usage or remaining allowance, retries, diff size, validation result, fallback worker, and quality outcome. Use null/empty values when unavailable and mark estimates explicitly. Never invent percentages, tokens, costs, or model multipliers.
 10. Generate an initial architecture/context summary under docs/agent-context/ only when the current repository does not already contain an authoritative equivalent. Prefer links to existing documentation over duplicated truth.
 11. Run the toolkit validation script and the repository's non-destructive validation commands that are practical in the environment.
-12. Present the resulting diff, unresolved unknowns, validation results, and recommended next task. When Claude was interrupted, report exactly where it stopped, what Codex completed afterward, what work lost independent Claude input, what compensating review/testing was performed, and whether residual quality risks remain. Do not merge or push unless explicitly instructed.
+12. Execute applicable interactive acceptance testing yourself as Codex. For UI/UX/design review, capture named evidence and provide it to Claude only as a static review package; do not delegate product operation.
+13. Present the resulting diff, unresolved unknowns, validation results, interactive test evidence, and recommended next task. When Claude was interrupted, report exactly where it stopped, what Codex completed afterward, what work lost independent Claude input, what compensating review/testing was performed, and whether residual quality risks remain. Do not merge or push unless explicitly instructed.
 
 Project-specific intent, if supplied by the user:
 [DESCRIBE THE PROJECT, CURRENT MILESTONE, AND IMPORTANT CONSTRAINTS HERE. Leave this section as "not supplied" when absent.]
 
 Operating principles:
 - Repository evidence overrides assumptions.
+- Runtime behavior observed by Codex overrides assumptions made from static code.
 - Documentation and code must remain synchronized.
 - Use the smallest sufficient context and least-privilege file scope.
 - Do not claim tests passed unless they were actually executed successfully.
+- Do not delegate interactive product testing to Claude Code.
 - Do not stop a task solely because Claude Code is unavailable.
 - Stop after the configured overall attempt limit instead of entering an unbounded repair loop.
 - Escalate architectural ambiguity to the human instead of silently inventing policy.
@@ -124,14 +132,24 @@ product-repository/
 ```text
 Human request
   -> Codex verifies repository context
+  -> Codex reproduces behavior and gathers runtime evidence when applicable
   -> Codex creates a task contract
   -> Codex selects codex-self or Claude Code
-  -> Claude succeeds: Codex reviews and validates
+  -> UI/UX/design task: Claude receives static evidence and scoped files
+  -> Claude succeeds: Codex reviews, operates the product, and validates
   -> Claude is interrupted: Codex checkpoints, reviews partial work, and finishes the task
-  -> Validation commands run
+  -> Codex executes browser/app/device/ADB acceptance tests
   -> Codex reports worker history, evidence, and residual risk
   -> Human approves, rejects, or requests another task
 ```
+
+## Testing and design ownership
+
+Codex owns runtime truth. It launches and uses the product, reproduces bugs, operates browsers and applications, controls emulators or devices, uses ADB and other bridges, captures evidence, and runs final acceptance flows.
+
+Claude is the preferred specialist for bounded UI/UX/design work. Codex can provide screenshots, recordings, layout snapshots, hierarchy dumps, design-system references, and implementation context. Claude compares and improves the experience from those materials but does not operate the product itself.
+
+This division avoids paying Claude for repetitive application operation while preserving its value where visual and interaction judgement matters most.
 
 ## Claude interruption detection
 
@@ -167,6 +185,7 @@ Historical observations are local evidence, not universal claims. For example, a
 - Maximum three implementation attempts per task unless the human changes the policy.
 - A clean Git state is required before automated execution.
 - Claude unavailability triggers Codex fallback rather than task abandonment.
+- Claude never performs interactive application testing.
 - Generated work is rejected when required validation was not executed or evidence is missing.
 - Usage telemetry remains local and opt-in.
 
@@ -174,9 +193,9 @@ Historical observations are local evidence, not universal claims. For example, a
 
 Projects record the installed toolkit version in `.agent-team/toolkit-version`. Shared policy changes follow semantic versioning. Project-local changes remain owned by each product repository and should not be overwritten blindly during updates.
 
-## Scope of v0.2.0
+## Scope of v0.3.0
 
-This release standardizes the operating model, Claude-to-Codex fallback, persistent telemetry permission, and local usage reporting templates. It does not yet provide a fully autonomous cross-provider CLI, guaranteed provider-quota extraction, automatic GitHub pull-request management, or a universal normalized cost model. Missing provider usage data must remain explicitly unavailable rather than estimated silently.
+This release standardizes the operating model, Claude-to-Codex fallback, persistent telemetry permission, local usage reporting templates, and the Codex-runtime-testing/Claude-design-specialist division of responsibility. It does not yet provide a fully autonomous cross-provider CLI, guaranteed provider-quota extraction, automatic GitHub pull-request management, or a universal normalized cost model. Missing provider usage data must remain explicitly unavailable rather than estimated silently.
 
 ## License
 
