@@ -29,58 +29,40 @@ Use `.agent-team/commands.yaml` as the machine-readable command source.
 
 Do not claim a command passed unless it was actually executed successfully.
 
-## Engineering boundaries
-
-- Preserve separation of concerns and the existing architectural direction.
-- Keep business/domain logic independent of UI and infrastructure where the project architecture requires it.
-- Avoid god files, hidden global state, unnecessary dependencies, and speculative abstraction.
-- Do not add a dependency without checking maintenance activity, adoption, compatibility, and license.
-- Keep documentation and tests synchronized with behavior changes.
-- Do not perform unrelated cleanup inside a scoped task.
-
 ## Agent workflow
 
-Codex is the Engineering Director, task planner, router, final reviewer, continuity owner, and runtime-testing owner. Codex may implement tasks directly.
+Codex is the Engineering Director, task planner, router, continuity owner, runtime-test owner, final reviewer, and permission-override coordinator.
 
-Codex performs all interactive validation, including browser testing, installed-application use, emulator/simulator/device testing, ADB operations, API/CLI/database interaction, bug reproduction, screenshots, screen recordings, layout snapshots, hierarchy dumps, logs, and final acceptance-flow verification.
+Claude Code is an optional scoped implementation and UI/UX/design worker. By default it does not operate the product; Codex supplies static visual/runtime evidence and performs interactive validation.
 
-Claude Code is an optional scoped implementation and design worker. It may act only from a task contract under `.agent-team/tasks/` that states allowed files, forbidden files, context, acceptance criteria, validation commands, and attempt limits. Prefer Claude for bounded UI, UX, interaction-design, visual-hierarchy, component-composition, accessibility-presentation, and design-system-fidelity work.
+If Claude becomes unavailable, Codex preserves and reviews partial work and continues the task as `codex-self` without reducing acceptance criteria.
 
-Codex may supply Claude with screenshots, recordings, layout snapshots, hierarchy dumps, design references, tokens, and observed runtime evidence for comparison against approved design direction. Claude must not launch, install, navigate, click through, operate, or interactively test the product, browser, application, emulator, simulator, device, or ADB session.
+## Conditional restrictions and session overrides
 
-If Claude Code refuses, reaches a usage/capacity limit, exits unexpectedly, times out, or returns no usable result, Codex must not stop the task merely because Claude is unavailable. Codex must preserve and review partial changes, record an interruption checkpoint, continue the remaining work as `codex-self`, execute required validation, and report the fallback and residual quality risk.
+Repository restrictions are safe defaults. The human may override them for a concrete task and current session.
 
-Every implementation must:
+Before any conflicting action begins, the agent must stop and ask:
 
-1. run on a dedicated branch or isolated worktree;
-2. respect `.agent-team/permissions.yaml`;
-3. stay within the task contract;
-4. have all interactive testing executed by Codex;
-5. run required validation;
-6. receive a Codex diff review;
-7. report worker interruption and fallback evidence when applicable;
-8. stop before push, merge, release, or deployment unless the human explicitly authorizes it.
+> Ennen kuin aloitamme suorituksen, tehtävä vaatii annetun rajoituksen "<rajoitus>" overridea, jotta "<perustelu>" olisi mahdollista. Valtuutatko tämän tämän istunnon ajaksi?
+
+The agent must name the exact restriction and reason, request the narrowest sufficient scope, and record the answer under `.agent-team/overrides/`. Silence, ambiguity, or approval from another session is not authorization.
+
+A session override expires at session end and does not permanently change project policy. A permanent change requires a separate proposed diff and explicit approval.
+
+An override cannot bypass system/platform enforcement, applicable law or service terms, missing credentials or permissions, unavailable quota/subscription, or unavailable tooling.
 
 ## Usage telemetry permission
 
-Immediately after toolkit initialization, Codex must ask the human once whether local model-usage telemetry may be recorded. The answer must be persisted in `.agent-team/observability.yaml` as `granted` or `denied`; do not rely on conversation memory.
+Immediately after toolkit initialization, Codex asks once whether local model-usage telemetry may be recorded. Persist the answer in `.agent-team/observability.yaml`; do not rely on conversation memory.
 
-When permission is granted, record only values actually exposed by the provider or CLI. Unavailable token counts, usage percentages, remaining quota, or costs must remain null/empty. Estimates must be marked explicitly. Telemetry remains local unless the human separately authorizes transmission.
+## Engineering boundaries
 
-## Protected operations
+- Preserve separation of concerns and the established architecture.
+- Avoid god files, hidden global state, unnecessary dependencies, and speculative abstraction.
+- Verify dependency maintenance, adoption, compatibility, and license before adding one.
+- Keep documentation and tests synchronized with behavior.
+- Avoid unrelated cleanup inside scoped tasks.
 
-Agents must not autonomously:
+## Completion requirements
 
-- push or merge;
-- publish, deploy, or release;
-- alter production configuration or signing material;
-- access or expose secrets;
-- delegate interactive product testing to Claude Code;
-- weaken tests, lint rules, security checks, or acceptance criteria to force success;
-- exceed the configured retry limit;
-- invent usage or cost metrics;
-- transmit telemetry outside the repository without permission.
-
-## Definition of done
-
-A task is complete only when acceptance criteria are met, Codex has executed applicable interactive testing, required validation evidence is recorded, documentation is current, the final diff is reviewed, worker fallback history is reported when applicable, and remaining risks or unknowns are reported honestly.
+Every implementation must use the base permissions plus active overrides, run required validation, receive Codex review, report worker fallback and override use, and provide honest remaining risks. Push, merge, deployment, publication, signing, secret access, and other restricted operations are permitted only when base policy allows them or the human grants the required scoped override.
