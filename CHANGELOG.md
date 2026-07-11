@@ -2,14 +2,21 @@
 
 All notable changes to this project are documented here.
 
+## 0.4.0 — 2026-07-11
+
+- Made toolkit and project-policy restrictions conditional defaults rather than permanent prohibitions.
+- Added a mandatory pre-execution Finnish override confirmation prompt with concrete restriction and reason placeholders.
+- Added session-scoped, least-privilege override authorization and audit logging under `.agent-team/overrides/`.
+- Added explicit expiration, denial, revocation, and persistent-policy-change rules.
+- Clarified that overrides cannot create unavailable system capabilities, credentials, permissions, quota, subscriptions, or tooling, and cannot bypass external legal or platform constraints.
+- Updated project templates, permissions, orchestrator instructions, and bootstrap scripts to install and enforce the override workflow.
+
 ## 0.3.0 — 2026-07-11
 
-- Assigned all browser, application, emulator, simulator, device, ADB, CLI, API, database, and other interactive runtime testing to Codex.
-- Prohibited Claude Code from launching, navigating, operating, or interactively testing products and runtime environments.
-- Made Claude Code the preferred scoped specialist for UI, UX, interaction design, visual hierarchy, accessibility presentation, component composition, and design-system fidelity.
-- Added a static evidence handoff workflow where Codex supplies screenshots, recordings, layout snapshots, hierarchy dumps, design references, and runtime observations to Claude.
-- Added `policies/testing-and-design-ownership.md` and updated routing, orchestrator, project templates, and README guidance.
-- Required Codex to repeat applicable interactive validation after Claude-assisted implementation and retain final accountability for runtime truth.
+- Assigned all browser, application, emulator, device, ADB, API, CLI, database, and other interactive runtime testing to Codex.
+- Positioned Claude Code as the preferred bounded UI/UX/design specialist working from static evidence packages.
+- Added `policies/testing-and-design-ownership.md` and updated routing, prompts, and project templates.
+- Required Codex to provide runtime evidence and final interactive acceptance testing after Claude-assisted UI work.
 
 ## 0.2.0 — 2026-07-10
 
