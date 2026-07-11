@@ -2,6 +2,15 @@
 
 All notable changes to this project are documented here.
 
+## 0.3.0 — 2026-07-11
+
+- Assigned all browser, application, emulator, simulator, device, ADB, CLI, API, database, and other interactive runtime testing to Codex.
+- Prohibited Claude Code from launching, navigating, operating, or interactively testing products and runtime environments.
+- Made Claude Code the preferred scoped specialist for UI, UX, interaction design, visual hierarchy, accessibility presentation, component composition, and design-system fidelity.
+- Added a static evidence handoff workflow where Codex supplies screenshots, recordings, layout snapshots, hierarchy dumps, design references, and runtime observations to Claude.
+- Added `policies/testing-and-design-ownership.md` and updated routing, orchestrator, project templates, and README guidance.
+- Required Codex to repeat applicable interactive validation after Claude-assisted implementation and retain final accountability for runtime truth.
+
 ## 0.2.0 — 2026-07-10
 
 - Made Claude Code an optional worker rather than a task-completion dependency.
