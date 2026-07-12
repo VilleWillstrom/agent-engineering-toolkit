@@ -60,7 +60,9 @@ class CheckResult:
     def successful(self) -> bool:
         normalized = self.state.upper()
         bucket = (self.bucket or "").upper()
-        return normalized in {"SUCCESS", "PASS", "COMPLETED"} or bucket == "PASS"
+        if bucket:
+            return bucket == "PASS"
+        return normalized in {"SUCCESS", "PASS"}
 
     @property
     def terminal(self) -> bool:
