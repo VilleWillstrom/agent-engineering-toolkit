@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "checks": {
+    "monitor": "gh",
+    "watch_after_push": true,
+    "watch_interval_seconds": 10,
+    "required_before_integration_merge": true,
+    "required_before_main_merge": true,
+    "fetch_failed_logs": true
+  },
+  "pull_requests": {
+    "default_draft": true,
+    "integration_base": "integration",
+    "main_base": "main"
+  }
+}
