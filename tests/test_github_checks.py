@@ -26,6 +26,14 @@ class GitHubChecksTests(unittest.TestCase):
         self.assertFalse(summary.all_terminal)
         self.assertFalse(summary.all_successful)
 
+    def test_completed_state_with_fail_bucket_is_failure(self):
+        def runner(command, **kwargs):
+            return subprocess.CompletedProcess(command, 0, '[{"name":"tests","state":"COMPLETED","bucket":"fail"}]', "")
+
+        summary = GitHubChecksMonitor(runner).fetch("42")
+        self.assertTrue(summary.all_terminal)
+        self.assertFalse(summary.all_successful)
+
     def test_nonzero_exit_raises(self):
         def runner(command, **kwargs):
             return subprocess.CompletedProcess(command, 1, "", "not authenticated")
