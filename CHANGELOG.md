@@ -2,6 +2,17 @@
 
 All notable changes to this project are documented here.
 
+## 0.5.0 — 2026-07-12
+
+- Added a dependency-free Python runtime and internal `aet` CLI while keeping VS Code Codex chat as the primary user interface.
+- Added capability-based agent provider registries with built-in templates for Codex, Claude Code, Gemini API, and local Ollama models.
+- Added extensible MCP/API/CLI platform registries with templates for Supabase, Render, Northflank, Google Cloud, and Azure.
+- Configured scripted Claude Code work to use stateless print mode so AET-created worker runs do not fill normal Claude Code conversation history.
+- Added safe AET-owned session cleanup and an override-gated legacy Claude project purge path.
+- Added deterministic GitHub PR checks monitoring through `gh pr checks --watch`.
+- Added a GitHub Actions Python 3.11–3.13 test matrix and comprehensive unit tests for registries, selection, cleanup, CLI behavior, and PR check parsing.
+- Updated bootstrap scripts to install provider, platform, cleanup, and GitHub runtime configuration.
+
 ## 0.4.0 — 2026-07-11
 
 - Made toolkit and project-policy restrictions conditional defaults rather than permanent prohibitions.
