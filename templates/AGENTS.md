@@ -21,48 +21,54 @@ Repository evidence overrides assumptions. Unknown facts must be marked `UNKNOWN
 
 ## Required commands
 
-Use `.agent-team/commands.yaml` as the machine-readable command source.
+Use `.agent-team/commands.yaml` as the command source.
 
 - Build: `{{BUILD_COMMAND}}`
 - Unit tests: `{{TEST_COMMAND}}`
 - Lint/static analysis: `{{LINT_COMMAND}}`
 
-Do not claim a command passed unless it was actually executed successfully.
+Never claim a command or CI check passed unless it completed successfully.
 
-## Agent workflow
+## Chat-first workflow
 
-Codex is the Engineering Director, task planner, router, continuity owner, runtime-test owner, final reviewer, and permission-override coordinator.
+VS Code Codex chat is the primary human interface. Codex may invoke the internal `aet` CLI, GitHub CLI, provider adapters, MCP servers, APIs, and local tools without requiring the human to operate them manually.
 
-Claude Code is an optional scoped implementation and UI/UX/design worker. By default it does not operate the product; Codex supplies static visual/runtime evidence and performs interactive validation.
+Codex is the Engineering Director, task planner, capability router, continuity owner, runtime-test owner, Git/PR owner, final reviewer, and permission-override coordinator.
 
-If Claude becomes unavailable, Codex preserves and reviews partial work and continues the task as `codex-self` without reducing acceptance criteria.
+## Agent provider pool
+
+Use `.agent-team/providers.json` as the provider registry. Route tasks by required capabilities and enabled providers, considering availability, project telemetry, quality, priority, locality, and cost.
+
+Claude Code is the default UI/UX/design specialist, but Gemini API, local Ollama models, and future providers may be enabled through validated registry entries. Scripted Claude work uses stateless print mode by default so one-shot AET tasks do not accumulate in normal conversation history.
+
+If a provider fails, reaches usage limits, times out, or returns unusable work, Codex preserves evidence and continues with another enabled capable provider or as `codex-self` without reducing acceptance criteria.
+
+## Remote platform pool
+
+Use `.agent-team/platforms.json` for Supabase, Render, Northflank, Google Cloud, Azure, and future MCP/API/CLI platforms. New integrations require official-method verification, environment permissions, validation, rollback guidance, tests, and audit behavior.
+
+## GitHub checks and delivery
+
+After pushing a task branch, Codex opens a draft PR and watches configured checks using `aet checks` or equivalent `gh pr checks --watch`. Pending checks are not success. Failed checks must be investigated and corrected within the configured attempt limit.
+
+The task should produce the most complete smoke-testable artifact or deployment practical for the project before requesting human acceptance.
 
 ## Conditional restrictions and session overrides
 
 Repository restrictions are safe defaults. The human may override them for a concrete task and current session.
 
-Before any conflicting action begins, the agent must stop and ask:
+Before any conflicting action begins, ask:
 
 > Ennen kuin aloitamme suorituksen, tehtävä vaatii annetun rajoituksen "<rajoitus>" overridea, jotta "<perustelu>" olisi mahdollista. Valtuutatko tämän tämän istunnon ajaksi?
 
-The agent must name the exact restriction and reason, request the narrowest sufficient scope, and record the answer under `.agent-team/overrides/`. Silence, ambiguity, or approval from another session is not authorization.
+Request the narrowest sufficient scope and record the answer. Silence, ambiguity, or approval from another session is not authorization. A session override expires at session end and does not permanently change policy.
 
-A session override expires at session end and does not permanently change project policy. A permanent change requires a separate proposed diff and explicit approval.
+An override cannot create missing credentials, permissions, quota, subscription, tooling, or platform capability.
 
-An override cannot bypass system/platform enforcement, applicable law or service terms, missing credentials or permissions, unavailable quota/subscription, or unavailable tooling.
+## Usage telemetry
 
-## Usage telemetry permission
-
-Immediately after toolkit initialization, Codex asks once whether local model-usage telemetry may be recorded. Persist the answer in `.agent-team/observability.yaml`; do not rely on conversation memory.
-
-## Engineering boundaries
-
-- Preserve separation of concerns and the established architecture.
-- Avoid god files, hidden global state, unnecessary dependencies, and speculative abstraction.
-- Verify dependency maintenance, adoption, compatibility, and license before adding one.
-- Keep documentation and tests synchronized with behavior.
-- Avoid unrelated cleanup inside scoped tasks.
+After initialization, ask once whether local model-usage telemetry may be recorded and persist the answer in `.agent-team/observability.yaml`.
 
 ## Completion requirements
 
-Every implementation must use the base permissions plus active overrides, run required validation, receive Codex review, report worker fallback and override use, and provide honest remaining risks. Push, merge, deployment, publication, signing, secret access, and other restricted operations are permitted only when base policy allows them or the human grants the required scoped override.
+A task is complete only when implementation, automated validation, applicable interactive testing, provider/fallback history, session cleanup, PR/check state, external changes, overrides, artifacts, smoke-test instructions, and residual risks are reported honestly.
