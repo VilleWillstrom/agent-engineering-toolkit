@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "providers": [
+    {
+      "id": "codex",
+      "enabled": true,
+      "adapter": "builtin",
+      "capabilities": ["planning", "code", "review", "runtime_testing", "git", "delivery"],
+      "priority": 100,
+      "cost_weight": 1.0,
+      "local": false,
+      "session": {"mode": "host_managed"}
+    },
+    {
+      "id": "claude-code",
+      "enabled": true,
+      "adapter": "command",
+      "capabilities": ["code", "ui_design", "ux_review", "visual_review", "accessibility_review"],
+      "priority": 90,
+      "cost_weight": 2.0,
+      "local": false,
+      "command": ["claude", "-p", "--no-session-persistence", "--output-format", "json", "{prompt}"],
+      "session": {
+        "mode": "stateless",
+        "persist_history": false,
+        "legacy_project_cleanup_preview": ["claude", "project", "purge", "{project_path}", "--dry-run"],
+        "legacy_project_cleanup_apply": ["claude", "project", "purge", "{project_path}", "--yes"],
+        "cleanup_requires_override": true
+      }
+    },
+    {
+      "id": "gemini-api",
+      "enabled": false,
+      "adapter": "http",
+      "capabilities": ["planning", "code", "review", "multimodal", "visual_review"],
+      "priority": 70,
+      "cost_weight": 1.0,
+      "local": false,
+      "endpoint": "https://generativelanguage.googleapis.com/v1beta/interactions",
+      "auth_env": "GEMINI_API_KEY",
+      "model": "CONFIGURE_MODEL_ID"
+    },
+    {
+      "id": "ollama-local",
+      "enabled": false,
+      "adapter": "ollama",
+      "capabilities": ["code", "review", "local_private"],
+      "priority": 60,
+      "cost_weight": 0.1,
+      "local": true,
+      "endpoint": "http://127.0.0.1:11434/api/generate",
+      "model": "CONFIGURE_LOCAL_MODEL"
+    }
+  ]
+}
