@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent-engineering-toolkit"
+version = "0.5.0"
+description = "Chat-first runtime and policy toolkit for extensible agent engineering workflows"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+aet = "aet_runtime.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "aet_session_root": ".agent-team/runtime/sessions",
+  "retain_last": 10,
+  "max_age_days": 30,
+  "run_after_task": true,
+  "providers": {
+    "claude-code": {
+      "default_mode": "stateless",
+      "prevent_new_history": true,
+      "project_purge_requires_session_override": true
+    }
+  }
+}

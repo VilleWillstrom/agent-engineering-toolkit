@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "platforms": [
+    {
+      "id": "supabase",
+      "enabled": false,
+      "adapter": "mcp",
+      "capabilities": ["database", "auth", "storage", "edge_functions", "migrations"],
+      "priority": 80,
+      "cost_weight": 1.0,
+      "config_reference": ".agent-team/platforms/supabase.json"
+    },
+    {
+      "id": "render",
+      "enabled": false,
+      "adapter": "mcp",
+      "capabilities": ["deploy", "services", "logs", "metrics", "databases"],
+      "priority": 80,
+      "cost_weight": 1.0,
+      "config_reference": ".agent-team/platforms/render.json"
+    },
+    {
+      "id": "northflank",
+      "enabled": false,
+      "adapter": "api",
+      "capabilities": ["deploy", "services", "jobs", "logs", "databases"],
+      "priority": 70,
+      "cost_weight": 1.0,
+      "config_reference": ".agent-team/platforms/northflank.json"
+    },
+    {
+      "id": "google-cloud",
+      "enabled": false,
+      "adapter": "cli",
+      "capabilities": ["deploy", "compute", "storage", "database", "secrets", "observability"],
+      "priority": 70,
+      "cost_weight": 1.0,
+      "command": ["gcloud"]
+    },
+    {
+      "id": "azure",
+      "enabled": false,
+      "adapter": "cli",
+      "capabilities": ["deploy", "compute", "storage", "database", "secrets", "observability"],
+      "priority": 70,
+      "cost_weight": 1.0,
+      "command": ["az"]
+    }
+  ]
+}
