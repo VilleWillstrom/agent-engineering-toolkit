@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AET provider registry",
+  "type": "object",
+  "required": ["schema_version", "providers"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "providers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "enabled", "adapter", "capabilities"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "enabled": {"type": "boolean"},
+          "adapter": {"enum": ["builtin", "command", "http", "ollama", "mcp", "api", "cli", "custom"]},
+          "capabilities": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+          "priority": {"type": "integer"},
+          "cost_weight": {"type": "number", "exclusiveMinimum": 0}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": false
+}
