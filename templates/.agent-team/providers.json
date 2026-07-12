@@ -20,6 +20,7 @@
       "cost_weight": 2.0,
       "local": false,
       "command": ["claude", "-p", "--no-session-persistence", "--output-format", "json", "{prompt}"],
+      "response_text_path": ["result"],
       "session": {
         "mode": "stateless",
         "persist_history": false,
@@ -37,8 +38,14 @@
       "cost_weight": 1.0,
       "local": false,
       "endpoint": "https://generativelanguage.googleapis.com/v1beta/interactions",
-      "auth_env": "GEMINI_API_KEY",
-      "model": "CONFIGURE_MODEL_ID"
+      "headers_env": {"x-goog-api-key": "GEMINI_API_KEY"},
+      "request_body": {
+        "model": "CONFIGURE_MODEL_ID",
+        "store": false,
+        "input": "{prompt}"
+      },
+      "response_text_path": ["steps", -1, "content", 0, "text"],
+      "timeout_seconds": 120
     },
     {
       "id": "ollama-local",
@@ -49,7 +56,13 @@
       "cost_weight": 0.1,
       "local": true,
       "endpoint": "http://127.0.0.1:11434/api/generate",
-      "model": "CONFIGURE_LOCAL_MODEL"
+      "request_body": {
+        "model": "CONFIGURE_LOCAL_MODEL",
+        "prompt": "{prompt}",
+        "stream": false
+      },
+      "response_text_path": ["response"],
+      "timeout_seconds": 300
     }
   ]
 }
