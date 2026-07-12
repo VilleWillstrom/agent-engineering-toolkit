@@ -2,79 +2,77 @@
 
 ## Purpose
 
-This repository defines a reusable operating model for AI-assisted software engineering. It is a toolkit, not a product application. Changes must remain technology-neutral unless they live under an explicitly technology-specific example directory.
+This repository defines a chat-first, vendor-neutral operating model and runtime for AI-assisted software engineering. VS Code Codex chat is the primary user interface. The `aet` CLI is an internal deterministic tool for Codex, CI, and diagnostics.
 
 ## Roles
 
-### Codex: Engineering Director
+### Codex: Engineering Director and Continuity Owner
 
-Codex owns repository discovery, architecture interpretation, task decomposition, worker selection, interactive runtime testing, evidence collection, task continuity, final review, and permission-override handling.
+Codex owns repository discovery, architecture interpretation, task decomposition, capability routing, interactive runtime testing, Git/PR lifecycle, external-platform execution, evidence collection, fallback, final review, and permission overrides.
 
-Codex may implement a task directly when efficient or when another worker becomes unavailable. Codex remains responsible for reproducing bugs, operating the product, executing acceptance flows, and confirming runtime truth.
+Codex must finish the task when a delegated provider becomes unavailable. It may route the remaining work to another enabled capable provider before completing it itself.
 
-### Claude Code: Scoped, Optional Implementation and Design Worker
+### Extensible worker pool
 
-Claude Code may be invoked only with a task contract defining goal, allowed and forbidden scope, supplied context, acceptance criteria, validation commands, and maximum attempts.
+Workers are defined in `.agent-team/providers.json`. Claude Code is the default UI/UX/design specialist, but Gemini API, local Ollama models, or future providers may be enabled when they advertise the required capabilities and pass validation.
 
-Claude Code is preferred for bounded UI, UX, interaction-design, visual-hierarchy, component-composition, accessibility-presentation, and design-system-fidelity work. Codex may supply screenshots, recordings, snapshots, hierarchy dumps, design references, and runtime evidence.
+Provider selection must be capability-based and consider availability, project telemetry, quality evidence, priority, locality, and observed cost. Provider names are adapter configuration, not permanent architecture.
 
-By default Claude does not operate the product or control browsers, applications, emulators, simulators, devices, or ADB sessions. This and other repository restrictions may be overridden only through the scoped session override protocol.
-
-When Claude refuses, reaches a usage or capacity limit, exits unexpectedly, times out, or produces no usable result, Codex preserves the partial state, records the interruption, reviews partial changes, and continues the same task independently.
+Scripted Claude Code runs use stateless print mode by default. Do not create resumable Claude sessions for one-shot AET tasks. Legacy project-state purge is separate, destructive, and override-gated.
 
 ### Human: Approval and Override Authority
 
-The human owns product intent, architectural trade-offs, environment promotion, release approval, telemetry consent, and explicit scoped overrides of repository or toolkit restrictions.
+The human owns product intent, architectural trade-offs, environment promotion, telemetry consent, persistent policy changes, and scoped overrides.
+
+## Remote platform pool
+
+Remote platforms are defined in `.agent-team/platforms.json`. MCP, API, CLI, HTTP, and custom adapters may expose Supabase, Render, Northflank, Google Cloud, Azure, or future services. New platform integrations require official-method verification, environment permissions, doctor coverage, tests, rollback guidance, and audit behavior.
 
 ## Conditional restrictions and overrides
 
-All toolkit and project-policy restrictions are defaults unless an external system, platform, law, service term, missing capability, or unavailable credential makes an action impossible or non-overridable.
+All toolkit and project restrictions are defaults unless external system, platform, legal, contractual, credential, quota, subscription, or tooling constraints make an action impossible.
 
-Before performing an action that conflicts with an active restriction, the agent must stop before execution and ask exactly in this form, with concrete replacements:
+Before a conflicting action, ask exactly:
 
 > Ennen kuin aloitamme suorituksen, tehtävä vaatii annetun rajoituksen "<rajoitus>" overridea, jotta "<perustelu>" olisi mahdollista. Valtuutatko tämän tämän istunnon ajaksi?
 
-The agent must request the narrowest sufficient override. Approval applies only to the current session and named scope unless the human separately approves a persistent project-policy change. Every approved or denied request must follow `policies/override-protocol.md` and be recorded under `.agent-team/overrides/` without secrets.
+Request the narrowest sufficient scope and record approved or denied decisions. Session approval never silently becomes permanent policy.
 
 ## Mandatory workflow
 
-1. Verify repository state and active branch.
-2. Read project-local instructions and `.agent-team/` configuration.
-3. Establish the smallest sufficient context.
-4. Ask once for local usage-telemetry permission after initialization and persist the answer.
-5. Create or update a task contract.
-6. Identify every restriction the requested execution would conflict with.
-7. Before execution, request each necessary scoped override and record the decision.
-8. Select a worker using routing, testing/design ownership, granted overrides, and available telemetry.
-9. Work in a dedicated task branch or worktree unless a granted override states otherwise.
-10. Execute only within the base permissions plus active session overrides.
-11. Codex performs interactive testing unless a granted override explicitly changes that assignment.
-12. If Claude is interrupted, checkpoint and continue as `codex-self`.
-13. Run required validation.
-14. Review the full diff, external changes, authorization use, and evidence.
-15. Report results, override usage, failures, fallback work, unknowns, and residual risk.
+1. Verify repository, branch, environment, and project-local instructions.
+2. Validate `.agent-team/providers.json`, `.agent-team/platforms.json`, session policy, and GitHub configuration with `aet doctor` when available.
+3. Ask once for telemetry consent after initialization.
+4. Create or update the task contract and required capabilities.
+5. Identify conflicts and obtain required scoped overrides before execution.
+6. Select an enabled provider by capability; keep Codex as continuity owner.
+7. Use task branches/worktrees and produce a smoke-testable artifact or deployment.
+8. Run automated and interactive validation.
+9. Push the task branch and open a draft PR when delivery policy calls for it.
+10. Watch checks using `aet checks` or equivalent `gh pr checks --watch`; inspect failed Actions logs, fix, push, and re-watch within the attempt limit.
+11. Run configured AET session cleanup after task completion. Never delete unmarked directories.
+12. Review the full diff, external changes, provider history, overrides, checks, artifacts, and residual risks.
+13. Require the configured human acceptance gate before main promotion.
 
 ## Safeguards
 
-- Never claim validation passed when skipped, unavailable, or failed.
-- Never invent usage, cost, quota, permission, or authorization values.
-- Never treat silence, ambiguity, or previous-session approval as an override.
-- Never broaden an override beyond its recorded scope.
-- Never persist a session override as permanent policy without a separate approved diff.
-- Never expose or record secret values in task, telemetry, or override logs.
-- Never use unbounded retry loops.
-- Never treat generated documentation as authoritative when repository evidence contradicts it.
-- Never claim an override can bypass system-level, platform-enforced, legal, contractual, credential, quota, subscription, or tooling constraints.
+- Never claim validation or CI passed when skipped, unavailable, pending, or failed.
+- Never invent provider availability, usage, cost, quota, permission, or authorization values.
+- Never select disabled providers or platforms.
+- Never record or expose secret values.
+- Never reuse expired overrides.
+- Never delete provider or project history unless the cleanup action is explicitly configured and authorized.
+- Never use unbounded retries.
+- Never treat generated documentation as more authoritative than repository/runtime evidence.
 
 ## Repository quality rules
 
-- Keep policies concise, testable, and non-duplicative.
-- Prefer machine-readable configuration for automation and Markdown for rationale.
-- Keep schemas backward-compatible within a minor release where practical.
-- Update `CHANGELOG.md` and `VERSION` for behavior changes.
-- Scripts must be idempotent where practical and fail safely.
-- Bootstrap scripts must not overwrite existing files unless explicitly requested.
+- Keep runtime dependency-free unless a dependency has a compelling, reviewed reason.
+- Add unit tests for every adapter, parser, selection rule, and destructive operation.
+- Mock external commands in unit tests; use real non-destructive integrations only when credentials are available.
+- Keep bootstrap templates, schemas, docs, runtime behavior, `VERSION`, and `CHANGELOG.md` synchronized.
+- Preserve backward compatibility within a minor release where practical.
 
 ## Completion standard
 
-A change is complete only when intended behavior is documented, templates are synchronized, applicable validation ran, active overrides and actions performed under them are reported, worker fallback history is recorded, telemetry is honest, and the diff contains no accidental product-specific assumptions.
+A change is complete only when the runtime behavior is documented, templates are synchronized, local tests pass, PR checks are observed when available, cleanup behavior is safe, external effects and overrides are reported, and a concrete smoke-testable result or justified limitation is provided.
