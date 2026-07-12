@@ -2,73 +2,70 @@
 
 A versioned, vendor-neutral foundation for running a disciplined AI engineering team inside a software repository.
 
-Codex acts as Engineering Director, integration owner, runtime tester, continuity owner, and final reviewer. Claude Code is an optional scoped implementation and UI/UX/design specialist. The workflow aims to produce a build, preview, deployment, APK, or other concrete artifact for human smoke testing rather than stopping at a code diff.
+Codex acts as Engineering Director, integration owner, runtime tester, continuity owner, and final reviewer. Other models and tools are capability-based workers. The primary user interface remains the VS Code Codex chat: the internal `aet` CLI exists for Codex, CI, and diagnostics, not as a mandatory human workflow.
 
-> Status: **v0.4.0 foundation**. Repository restrictions are safe defaults that may be overridden through explicit, scoped, session-only human authorization.
+> Status: **v0.5.0 runtime foundation**. AET now includes extensible provider/platform registries, stateless Claude worker sessions, safe cleanup, GitHub PR-check monitoring, and automated tests.
 
 ## What this repository provides
 
 - Project-local `AGENTS.md` and `CLAUDE.md` templates.
-- Machine-readable task, routing, permission, telemetry, and override configuration.
+- Machine-readable task, routing, permission, telemetry, override, provider, platform, session, and GitHub configuration.
+- Capability-based agent pools with Codex, Claude Code, Gemini API, and Ollama examples.
+- Extensible MCP/API/CLI platform adapters for Supabase, Render, Northflank, Google Cloud, Azure, and future services.
 - Claude-to-Codex fallback when Claude becomes unavailable.
-- Codex-owned interactive runtime testing and Claude-focused UI/UX/design work.
-- Local opt-in model usage reporting.
-- Scoped session override protocol with an audit trail.
-- PowerShell and Bash project bootstrap scripts.
+- Stateless Claude Code print-mode calls that do not create normal resumable conversation history.
+- Safe AET-owned session cleanup and override-gated legacy project purge.
+- Codex-owned runtime testing and Claude-focused UI/UX/design work.
+- `gh pr checks --watch` integration for CI observation.
+- A dependency-free Python runtime with a Python 3.11–3.13 test matrix.
 
 ## Fastest way to use it
 
-Open the target product repository in Codex and paste this prompt:
+Open the target product repository in VS Code Codex and paste this prompt:
 
 ```text
-You are the Engineering Director responsible for initializing and operating a safe, versioned multi-agent engineering workflow in the currently open product repository.
+You are the Engineering Director responsible for initializing and operating the Agent Engineering Toolkit in the currently open product repository.
 
 Assumptions:
 - OpenAI Codex is installed and authenticated.
-- Claude Code CLI is installed and authenticated.
+- Claude Code CLI is installed and authenticated when Claude is enabled.
+- Optional providers such as Gemini API or local Ollama may be configured by the user.
+- GitHub CLI is installed and authenticated when GitHub PR/check workflows are enabled.
 - The reusable toolkit source is https://github.com/VilleWillstrom/agent-engineering-toolkit.
 - The current repository is the product repository. Do not turn it into a fork of the toolkit.
 
 Your task:
-1. Read the toolkit README, AGENTS.md, policies, schemas, prompts, and templates.
-2. Inspect the product repository using targeted discovery. Verify its stack, architecture, build/test/lint commands, protected branches, environments, deployment targets, signing approach, remote platforms, and current delivery scope. Mark unknowns; do not guess.
+1. Read the toolkit README, AGENTS.md, policies, schemas, prompts, runtime package, and templates.
+2. Inspect the product repository using targeted discovery. Verify its stack, architecture, commands, branches, environments, deployment targets, signing approach, remote platforms, and delivery scope. Mark unknowns; do not guess.
 3. Install or update the project-local toolkit layer using the bootstrap script when practical.
-4. Create or update:
-   - AGENTS.md
-   - CLAUDE.md
-   - .agent-team/manifest.yaml
-   - .agent-team/routing.yaml
-   - .agent-team/permissions.yaml
-   - .agent-team/commands.yaml
-   - .agent-team/observability.yaml
-   - .agent-team/overrides.yaml
-   - .agent-team/metrics/
-   - .agent-team/overrides/
-   - .agent-team/tasks/
-   - .agent-team/reviews/
-   - .agent-team/toolkit-version
-5. Keep shared toolkit rules separate from project-specific facts.
-6. Ask once after initialization whether local model-usage telemetry may be recorded and persist the answer in `.agent-team/observability.yaml`.
-7. Treat all toolkit and repository restrictions as conditional defaults unless an external system, platform, applicable law or service term, missing permission/credential, unavailable quota/subscription, or unavailable tooling makes the action impossible or non-overridable.
-8. Before performing any action that conflicts with an active restriction, stop before execution and ask exactly, replacing the placeholders with concrete facts:
+4. Create or update the normal `.agent-team/` files plus:
+   - providers.json
+   - platforms.json
+   - session-cleanup.json
+   - github.json
+   - runtime/sessions/
+   - platforms/
+5. Keep VS Code Codex chat as the primary interface. Use `aet` commands internally when deterministic validation, provider selection, cleanup, or GitHub-check monitoring is useful. Do not require the human to use the CLI manually.
+6. Ask once whether local model-usage telemetry may be recorded and persist the answer.
+7. Detect every active restriction that conflicts with the requested execution. Before the conflicting action begins, ask exactly:
 
    Ennen kuin aloitamme suorituksen, tehtävä vaatii annetun rajoituksen "<rajoitus>" overridea, jotta "<perustelu>" olisi mahdollista. Valtuutatko tämän tämän istunnon ajaksi?
 
-9. Request the narrowest sufficient override. Record approved and denied requests under `.agent-team/overrides/`. Approval applies only to the current session and recorded task, operation, environment, platform, branch, resource, and scope. Silence, ambiguity, or another session is not authorization.
-10. A session override must not silently become permanent policy. For a persistent change, propose the exact policy diff and request separate explicit approval.
-11. Codex owns interactive runtime testing by default: browser, installed application, emulator, simulator, physical device, ADB, API, CLI, database, filesystem, bug reproduction, screenshots, recordings, layout snapshots, logs, and acceptance flows.
-12. Prefer Claude for bounded UI, UX, interaction design, visual hierarchy, accessibility presentation, component composition, and design-system fidelity. Supply Claude with static evidence collected by Codex. Claude does not operate the product unless the human explicitly grants a scoped session override for that restriction.
-13. Treat Claude as optional. If it refuses, reaches a usage/capacity limit, exits, times out, or produces no usable result, preserve and review partial work, record the interruption, and continue the same task as `codex-self` without reducing acceptance criteria.
-14. Use task branches/worktrees and non-production environments according to project policy. When the requested delivery requires push, merge, deployment, remote-platform configuration, signing, secret access, or another restricted operation, request the required override before execution unless base project policy already allows it.
-15. Use remote platforms such as Supabase, Render, Northflank, or equivalent MCP/API/CLI integrations only within verified permissions and the user-authorized environment scope. Record external changes and rollback information.
-16. Run all applicable automated and interactive validation.
-17. Produce the most complete smoke-testable result possible: artifact, preview URL, integration deployment, APK, installer, staging endpoint, hashes, commit SHA, test evidence, known risks, and smoke-test instructions as applicable.
-18. In the final report, list every override requested, whether it was granted, actions performed under it, its expiration, worker fallback history, validation evidence, external changes, and residual risk.
+8. Request the narrowest sufficient override and record the decision. Session overrides expire at session end and never silently become permanent policy.
+9. Route delegation by required capabilities and enabled provider registry entries, not by hard-coded vendor preference. Use project telemetry and observed quality when available.
+10. Keep Codex as continuity owner. If any delegated provider fails, reaches usage limits, times out, or returns unusable work, preserve evidence and continue with the next capable provider or Codex itself.
+11. Use Claude Code in stateless print mode with `--no-session-persistence` by default. Run AET session cleanup after tasks when configured. Treat `claude project purge` as a separate override-gated cleanup operation.
+12. Allow the user to add Gemini API, Ollama, or another model by adding and validating a provider registry entry and adapter configuration. Add tests for new adapter behavior.
+13. Allow the user to add Supabase, Render, Northflank, Google Cloud, Azure, or another MCP/API/CLI platform by adding a platform registry entry, environment permissions, validation, rollback guidance, and tests.
+14. Codex owns interactive runtime testing by default. Prefer Claude or another capable specialist for bounded UI/UX/design work from supplied evidence.
+15. After pushing a task branch, open a draft PR and monitor checks. Use `aet checks --pr <number> --repo <owner/repo> --watch` or equivalent `gh pr checks` behavior. Inspect failing Actions logs, fix the branch, push, and re-watch within the attempt limit.
+16. Produce the most complete smoke-testable result possible: artifact, preview URL, APK, installer, staging endpoint, hashes, commit SHA, validation evidence, known risks, and smoke-test instructions.
+17. In the final report, list providers used, fallbacks, session cleanup, overrides, external platform changes, PR/check status, and residual risks.
 
 Project-specific intent:
-[DESCRIBE THE PROJECT, CURRENT MILESTONE, DESIRED TESTABLE DELIVERABLE, AND IMPORTANT CONSTRAINTS HERE.]
+[DESCRIBE THE PROJECT, CURRENT MILESTONE, DESIRED TESTABLE DELIVERABLE, AVAILABLE PROVIDERS/PLATFORMS, AND IMPORTANT CONSTRAINTS HERE.]
 
-Begin by reporting verified repository facts. Perform initialization in a dedicated branch. Ask for telemetry consent after initialization and request any required restriction override before the restricted action begins.
+Begin by reporting verified repository facts. Perform initialization in a dedicated branch. Ask for telemetry consent after initialization and request required overrides before restricted actions.
 ```
 
 ## Manual bootstrap
@@ -102,39 +99,56 @@ product-repository/
     ├── commands.yaml
     ├── observability.yaml
     ├── overrides.yaml
+    ├── providers.json
+    ├── platforms.json
+    ├── session-cleanup.json
+    ├── github.json
     ├── toolkit-version
     ├── metrics/
     ├── overrides/
+    ├── runtime/sessions/
+    ├── platforms/
     ├── tasks/
     └── reviews/
 ```
 
+## Runtime commands
+
+These commands are primarily intended for Codex and CI:
+
+```bash
+aet doctor --strict
+aet providers list
+aet providers choose --capability ui_design
+aet platforms choose --capability deploy
+aet cleanup
+aet checks --pr 123 --repo owner/repo --watch
+```
+
+## Provider model
+
+Providers advertise capabilities such as `code`, `ui_design`, `review`, `multimodal`, `runtime_testing`, or `local_private`. Disabled providers are never selected. New providers use `builtin`, `command`, `http`, `ollama`, `mcp`, `api`, `cli`, or `custom` adapters.
+
+Claude Code uses stateless print-mode sessions by default, preventing AET worker calls from creating large resumable-history lists. Gemini and Ollama examples are disabled until the user provides configuration.
+
+## Platform model
+
+Remote services use the same registry model. MCP, API, and CLI are transport mechanisms; environment permissions, override requirements, rollback, and audit behavior remain controlled by AET policy.
+
 ## Override model
 
-Restrictions are defaults, not invisible permanent walls. When the task requires an exception, the agent must identify it before execution, explain why it is needed, request a narrowly scoped current-session authorization, and record the decision.
-
-A session override:
-
-- applies only to the recorded scope;
-- expires at session end by default;
-- may be revoked at any time;
-- cannot be reused in another session;
-- does not permanently modify project policy;
-- cannot create unavailable access or bypass external constraints.
+Restrictions are defaults. A session override is narrowly scoped, recorded, expires at session end, does not silently change permanent policy, and cannot create unavailable credentials, quota, tooling, or platform capability.
 
 See `policies/override-protocol.md`.
 
-## Default role split
+## Testing
 
-- **Codex:** planning, integration, Git lifecycle, runtime operation, testing, remote-platform execution, evidence, fallback, and final review.
-- **Claude Code:** scoped implementation and UI/UX/design specialization from supplied context and static evidence.
-- **Human:** product acceptance, override authorization, persistent policy changes, and environment promotion according to project policy.
+```bash
+python -m pip install -e .
+python -m unittest discover -s tests -v
+```
 
-Every default role restriction may be overridden for the current session through the same explicit protocol when the user judges the exception worthwhile.
-
-## Usage telemetry
-
-Telemetry is disabled until the human grants permission. Record only values actually exposed by providers or CLIs. Unavailable values remain null/empty, and estimates must be explicitly marked.
+GitHub Actions runs the suite on Python 3.11, 3.12, and 3.13 for pull requests and pushes to `main` or `integration`.
 
 ## Versioning
 
